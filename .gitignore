@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets: never commit tokens or env files
+.env
+.env.*
+*.token
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
