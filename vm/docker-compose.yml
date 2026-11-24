@@ -1,0 +1,41 @@
+# Locust VM: the dashboard always runs the latest tests from rata-loadtest `master`.
+# Setup steps: vm/README.md
+#
+#   git-sync   pulls master every 60 s into the shared volume (read-only deploy key)
+#   locust     vm/supervisor.py runs Locust with every test and --class-picker, and restarts it
+#              on a new commit when no test is running
+services:
+  git-sync:
+    image: registry.k8s.io/git-sync/git-sync:v4.4.0
+    restart: unless-stopped
+    command:
+      - --repo=git@github.com:rataid/rata-loadtest.git
+      - --ref=master
+      - --root=/git
+      - --link=rata-loadtest
+      - --period=60s
+      - --max-failures=-1
+    volumes:
+      - repo:/git
+      - ./secrets/deploy_key:/etc/git-secret/ssh:ro
+      - ./secrets/known_hosts:/etc/git-secret/known_hosts:ro
+
+  locust:
+    image: locustio/locust:2.47.0
+    restart: unless-stopped
+    depends_on: [git-sync]
+    # The supervisor lives in the checkout too; changes to it apply after `docker compose restart locust`.
+    entrypoint: ["sh", "-c", "until [ -f /git/rata-loadtest/vm/supervisor.py ]; do echo waiting for git-sync; sleep 5; done; exec python -u /git/rata-loadtest/vm/supervisor.py"]
+    environment:
+      REPO_DIR: /git/rata-loadtest
+      CHECK_SECONDS: "30"
+      PYTHONDONTWRITEBYTECODE: "1"
+      # Keep the dashboard login you use today, e.g. LOCUST_ARGS: "--web-login" or LOCUST_WEB_AUTH
+      LOCUST_ARGS: ""
+    ports:
+      - "8089:8089"
+    volumes:
+      - repo:/git:ro
+
+volumes:
+  repo:

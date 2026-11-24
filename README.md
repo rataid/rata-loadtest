@@ -13,6 +13,8 @@ rata-loadtest/
 ├── run-local.ps1/.sh      run a test's dashboard locally in Docker
 ├── tools/
 │   └── dryrun.ps1/.sh     run a test's dry run (fake server, no network)
+├── vm/                    Locust VM setup: always runs the latest tests from master
+│   └── README.md          one-time setup steps for SRE
 ├── .claude/skills/
 │   └── new-loadtest/      the /new-loadtest command for Claude Code
 └── tests/
@@ -21,7 +23,7 @@ rata-loadtest/
     └── <test-name>/
         ├── CONTEXT.md       what to test and why (filled-in form)
         ├── locustfile.py    the test
-        ├── dryrun_test.py   checks the test against a fake server (tests that write data)
+        ├── _dryrun_test.py  checks the test against a fake server (tests that write data)
         ├── README.md        how to run it, what to watch, report template
         └── results/         one report per real run
 ```
@@ -54,13 +56,13 @@ behavior: `.ps1` for Windows (PowerShell) and `.sh` for macOS and Linux (bash); 
    It reads the branch without switching your checkout, finds the requests itself and shows them to you to confirm. Numbers (users, sizes) must come
    from the team or the PM; say "unknown" rather than guessing.
 3. It writes `tests/<test-name>/CONTEXT.md` from your answers, asks you to confirm, then writes `locustfile.py`,
-   `README.md` (and `dryrun_test.py` for tests that write data or upload files), and runs the checks.
+   `README.md` (and `_dryrun_test.py` for tests that write data or upload files), and runs the checks.
 
    Already filled in the form by hand (`tests/_template/CONTEXT.md`)? Run
    `npm run loadtest:new -- tests/<test-name>/CONTEXT.md`.
 4. **Review** the generated script: how much data it creates, which hosts it calls, the per-user limit.
 5. **Rehearse locally** with your own token, 1 user and small values (see "Check a test" below).
-6. Ask SRE to load it on the Locust VM.
+6. Merge it to `master`. The Locust VM picks it up within a minute or two (see "Where tests run").
 
 Without Claude Code, follow the same steps by hand with `CLAUDE.md` and the reference test.
 
@@ -86,8 +88,13 @@ write data or upload files have one; read-only tests are checked with a local re
 
 ## Where tests run
 
-Real load tests run on the Locust VM in Singapore (Docker), managed by SRE. Ask them to load a test's `locustfile.py`
-and to start Locust with `--class-picker`, so the dashboard runs only the test you choose.
+Real load tests run on the Locust VM in Singapore (Docker), managed by SRE. After a one-time setup
+([vm/README.md](vm/README.md)) the VM pulls `master` by itself and loads every test with `--class-picker`: on the
+dashboard, tick the test's user class under **User classes** and start. A new test appears a minute or two after it
+is merged; a test that doesn't load is skipped and the previous version keeps running.
+
+Only files named `locustfile.py` are tests: any other `.py` file under `tests/` must start with `_`
+(see CLAUDE.md rule 14).
 Agree on a time slot with anyone else load testing the same environment, so results don't mix.
 
 ## Rules

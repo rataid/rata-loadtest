@@ -15,8 +15,8 @@ The upload always goes through the proxy. If the backend returns a `*.linodeobje
 
 ## Before the test
 
-- **Script:** SRE puts `locustfile.py` into the Locust Docker container. Ask them again whenever the script changes.
-- **Only our script should run.** If the existing health-check script stays loaded too, both run together and `/app/live` requests mix into the results. Either SRE loads only this file, or starts Locust with `--class-picker` and you tick only `DesignExportUser` on the start form.
+- **Script:** once the VM is set up as in [vm/README.md](../../vm/README.md), it runs the latest `master` by itself. Until then, SRE puts `locustfile.py` into the Locust Docker container; ask them again whenever the script changes.
+- **Only our script should run.** Under **User classes** on the start form, tick only `DesignExportUser`. If another script is loaded without `--class-picker` (e.g. the old health-check script), both run together and `/app/live` requests mix into the results.
 - **Where Locust runs:** a Docker container on a VM in Singapore, the same region as the Linode bucket (confirmed by SRE, 2026-11-20). It calls the public gateway and proxy, the same path as a browser. A small VM can still be the bottleneck: if uploads are slow but the proxy is calm in Grafana, check the VM's CPU and network.
 - **Locust version:** the script was tested with 2.47. Ask SRE which version the VM runs.
 - **Time slot:** agree on one with Kin (and anyone else load testing sandbox), so results don't mix.

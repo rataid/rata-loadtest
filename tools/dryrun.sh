@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run a test's dry run (tests/<name>/dryrun_test.py) inside the official Locust image
+# Run a test's dry run (tests/<name>/_dryrun_test.py) inside the official Locust image
 # (macOS / Linux; Windows: tools/dryrun.ps1).
 # The dry run talks only to a fake server on 127.0.0.1 inside the container: nothing reaches sandbox.
 #
@@ -18,8 +18,8 @@ test_name="$1"; shift
 version="${VERSION:-latest}"
 test_dir="$repo_dir/tests/$test_name"
 
-if [ ! -f "$test_dir/dryrun_test.py" ]; then
-  echo "No dryrun_test.py in tests/$test_name" >&2
+if [ ! -f "$test_dir/_dryrun_test.py" ]; then
+  echo "No _dryrun_test.py in tests/$test_name" >&2
   exit 1
 fi
 
@@ -30,4 +30,4 @@ if pwd -W >/dev/null 2>&1; then mount_dir="$(cd "$test_dir" && pwd -W)"; fi
 
 # --network none: the container has no network access except its own 127.0.0.1
 docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "$mount_dir:/mnt/locust" \
-  --entrypoint python "locustio/locust:$version" /mnt/locust/dryrun_test.py "$@"
+  --entrypoint python "locustio/locust:$version" /mnt/locust/_dryrun_test.py "$@"

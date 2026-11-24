@@ -1,4 +1,4 @@
-# Run a test's dry run (tests/<name>/dryrun_test.py) inside the official Locust image.
+# Run a test's dry run (tests/<name>/_dryrun_test.py) inside the official Locust image.
 # The dry run talks only to a fake server on 127.0.0.1 inside the container: nothing reaches sandbox.
 #
 #   .\tools\dryrun.ps1 -Test stl-presign-upload
@@ -12,11 +12,11 @@ param(
 )
 
 $testDir = Join-Path (Split-Path $PSScriptRoot -Parent) "tests\$Test"
-if (-not (Test-Path (Join-Path $testDir "dryrun_test.py"))) {
-  Write-Error "No dryrun_test.py in tests\$Test"
+if (-not (Test-Path (Join-Path $testDir "_dryrun_test.py"))) {
+  Write-Error "No _dryrun_test.py in tests\$Test"
   exit 1
 }
 
 # --network none: the container has no network access except its own 127.0.0.1
-docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${testDir}:/mnt/locust" --entrypoint python "locustio/locust:$Version" /mnt/locust/dryrun_test.py @Scenarios
+docker run --rm --network none -e PYTHONDONTWRITEBYTECODE=1 -v "${testDir}:/mnt/locust" --entrypoint python "locustio/locust:$Version" /mnt/locust/_dryrun_test.py @Scenarios
 exit $LASTEXITCODE

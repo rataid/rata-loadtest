@@ -43,6 +43,14 @@ Collect these facts (the context form asks for them); most can't be read from th
     (e.g. a batch) if that's what the user experiences; don't add a row per request that doubles the totals.
 12. **Test data is labelled** with its own resource key / name prefix so it can be found and deleted.
 13. **Send credentials only where needed:** the token goes to the gateway, never to storage or a proxy.
+14. **Works next to the other tests.** The VM loads every test at once (`locust -f tests/ --class-picker`, see
+    `vm/README.md`), so:
+    - only `locustfile.py` may be a plain name: any other `.py` file under `tests/` starts with `_`
+      (`_dryrun_test.py`, `_helpers.py`), or Locust imports it as a test;
+    - the user class name is unique across all tests (e.g. `DesignExportUser`);
+    - custom parameter names don't clash with another test's: check the existing tests before adding one. Locust
+      fails at startup on a duplicate, and the VM then keeps the old version;
+    - no code at module level that does work (requests, file writes): importing the file must be harmless.
 
 ## README for each test
 
@@ -60,7 +68,7 @@ Copy the structure of `tests/stl-presign-upload/README.md`:
 
 1. **Dry run against a fake local server** (no real traffic), sized to the risk:
    - **Required** when the test writes anything (creates or changes records, uploads files) or sends large
-     payloads: a mistake there leaves data behind or overloads a service. Add a `dryrun_test.py` (copy the
+     payloads: a mistake there leaves data behind or overloads a service. Add a `_dryrun_test.py` (copy the
      reference's `--serve` pattern) covering success, each failure type, timeouts, a missing token, Stop, and that
      the per-user limit holds.
    - **Optional** for read-only tests (only GET or read queries): steps 2 and 3 below are enough.
@@ -69,7 +77,8 @@ Copy the structure of `tests/stl-presign-upload/README.md`:
    inside the Locust image with networking off.
 2. **Load it in the same Locust version as the VM** (`.\run-local.ps1 -Version <x.y.z>` on Windows,
    `VERSION=<x.y.z> ./run-local.sh` on macOS/Linux) and check every setting
-   appears on the start form.
+   appears on the start form. Also check it loads together with the other tests, as on the VM:
+   `docker run --rm -v "<repo>/tests:/t" locustio/locust:<x.y.z> -f /t --list` must list every test's user class.
 3. **Rehearse locally** against sandbox with 1 user and small values.
 4. **Review:** someone other than the author checks how much data the test creates and how hard it hits each
    service.

@@ -1,0 +1,37 @@
+# Try the VM setup on your own machine: same as docker-compose.yml, but git-sync pulls from your local clone
+# (committed `master` only, no deploy key needed) and the dashboard is on port 8090.
+#
+#   docker compose -f vm/docker-compose.local.yml up -d        from the repo root
+#   docker compose -f vm/docker-compose.local.yml logs -f
+#   docker compose -f vm/docker-compose.local.yml down -v      stop and remove
+#
+# Commit to master locally and the dashboard picks it up within ~15 s (nothing is pushed).
+services:
+  git-sync:
+    image: registry.k8s.io/git-sync/git-sync:v4.4.0
+    command:
+      - --repo=file:///source
+      - --ref=master
+      - --root=/git
+      - --link=rata-loadtest
+      - --period=5s
+      - --max-failures=-1
+    volumes:
+      - repo:/git
+      - ..:/source:ro
+
+  locust:
+    image: locustio/locust:2.47.0
+    depends_on: [git-sync]
+    entrypoint: ["sh", "-c", "until [ -f /git/rata-loadtest/vm/supervisor.py ]; do echo waiting for git-sync; sleep 5; done; exec python -u /git/rata-loadtest/vm/supervisor.py"]
+    environment:
+      REPO_DIR: /git/rata-loadtest
+      CHECK_SECONDS: "5"
+      PYTHONDONTWRITEBYTECODE: "1"
+    ports:
+      - "8090:8089"
+    volumes:
+      - repo:/git:ro
+
+volumes:
+  repo:

@@ -6,8 +6,8 @@ Run it with the repo tool (inside the official Locust image, no local Python nee
     .\\tools\\dryrun.ps1 -Test stl-presign-upload      (Windows)
     ./tools/dryrun.sh stl-presign-upload             (macOS / Linux)
 or directly:
-    python dryrun_test.py              all scenarios
-    python dryrun_test.py stop hang    only these scenarios
+    python _dryrun_test.py              all scenarios
+    python _dryrun_test.py stop hang    only these scenarios
 
 The fake server is this same file started in "--serve" mode in a separate
 process, so it runs without Locust's gevent patching.

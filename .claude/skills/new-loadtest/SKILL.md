@@ -1,6 +1,6 @@
 ---
 name: new-loadtest
-description: Create a Locust load test in the rata-loadtest repo. Interviews the user about what to test (or reads a filled-in tests/<name>/CONTEXT.md), writes CONTEXT.md, then generates locustfile.py, README.md and dryrun_test.py and dry-runs them. Use when someone asks to create, generate or write a new load test.
+description: Create a Locust load test in the rata-loadtest repo. Interviews the user about what to test (or reads a filled-in tests/<name>/CONTEXT.md), writes CONTEXT.md, then generates locustfile.py, README.md and _dryrun_test.py and dry-runs them. Use when someone asks to create, generate or write a new load test.
 ---
 
 # Create a load test
@@ -12,7 +12,7 @@ Two ways to start:
   anything missing).
 
 Always read `CLAUDE.md` (the rules) and the reference test `tests/stl-presign-upload/` (`CONTEXT.md`,
-`locustfile.py`, `README.md`, `dryrun_test.py`) before writing anything.
+`locustfile.py`, `README.md`, `_dryrun_test.py`) before writing anything.
 
 ## 1. Interview
 
@@ -83,7 +83,7 @@ In the test folder, following `CLAUDE.md` and the reference:
   cleanup, rows named by step, test data labelled with the agreed prefix.
 - `README.md`: same sections as the reference README, filled from the context (cases, settings table, rows,
   failures table, Grafana, rehearsal, cleanup, report template).
-- `dryrun_test.py`, **only when the test writes data or sends large payloads** (see `CLAUDE.md`, "Check before
+- `_dryrun_test.py`, **only when the test writes data or sends large payloads** (see `CLAUDE.md`, "Check before
   anyone runs it"): a fake server for every host the test calls (same `--serve` pattern as the reference), and
   scenarios for: success, each failure type of each step, a hang (timeout), connection refused, missing token,
   the per-user limit, and Stop. For a read-only test, skip it and say so in the report; offer to add one if the
@@ -94,7 +94,7 @@ In the test folder, following `CLAUDE.md` and the reference:
 
 Use the script version for the user's system: `.ps1` on Windows (PowerShell), `.sh` on macOS/Linux (bash).
 
-1. If the test has a `dryrun_test.py`: `.\tools\dryrun.ps1 -Test <name>` or `./tools/dryrun.sh <name>` (runs
+1. If the test has a `_dryrun_test.py`: `.\tools\dryrun.ps1 -Test <name>` or `./tools/dryrun.sh <name>` (runs
    inside the Locust image with no network). Fix the test, not the checks, until all pass. If a check itself is
    wrong, say why before changing it.
 2. Start the dashboard once (`.\run-local.ps1 -Test <name> -Detach -Port 18089`, or
@@ -112,6 +112,6 @@ Tell the user:
 - that a person must review the script before it goes to the Locust VM, and what to look at first (data volume,
   hosts it calls, the per-user limit);
 - next steps: local rehearsal (`.\run-local.ps1 -Test <name>` or `TEST=<name> ./run-local.sh`; 1 user, small
-  values), then ask SRE to load it.
+  values), then merge to `master`: the Locust VM picks it up by itself (`vm/README.md`).
 
 Do not commit or push unless asked.
