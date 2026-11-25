@@ -21,7 +21,9 @@ Collect these facts (the context form asks for them); most can't be read from th
 ## Script rules
 
 1. **One folder per test** under `tests/<test-name>/` with `locustfile.py`, `README.md` and `results/`.
-2. **Set `host`** on the user class to the target (e.g. `https://gateway-sandbox-dynamic.rata.id`).
+2. **No `host` on the user class.** The target is typed into the Host field of the start form, so one field decides
+   where every test goes (a class host only shows up as a confusing second Host in the ⚙ settings). Put the
+   value to type in the test's README (e.g. `https://gateway-sandbox-dynamic.rata.id`).
 3. **Token in the form only.** Add it as a custom parameter with `is_secret=True`. No env var, no default value,
    nothing in the Docker command.
 4. **Settings as custom parameters** (`include_in_web_ui` is the default for parser arguments added in
@@ -47,7 +49,8 @@ Collect these facts (the context form asks for them); most can't be read from th
     `vm/README.md`), so:
     - only `locustfile.py` may be a plain name: any other `.py` file under `tests/` starts with `_`
       (`_dryrun_test.py`, `_helpers.py`), or Locust imports it as a test;
-    - the user class name is unique across all tests (e.g. `DesignExportUser`);
+    - the user class is named after the test folder in PascalCase plus `User` (`stl-presign-upload` →
+      `StlPresignUploadUser`): it is the name shown in the dashboard picker, and it stays unique;
     - custom parameter names don't clash with another test's: check the existing tests before adding one. Locust
       fails at startup on a duplicate, and the VM then keeps the old version;
     - no code at module level that does work (requests, file writes): importing the file must be harmless.

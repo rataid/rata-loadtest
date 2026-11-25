@@ -176,7 +176,7 @@ def main(only):
             for key, value in values.items():
                 args += [key, value]
             opts = get_parser().parse_args(args=args)
-            env = Environment(user_classes=[mod.DesignExportUser], host=base, parsed_options=opts)
+            env = Environment(user_classes=[mod.StlPresignUploadUser], host=base, parsed_options=opts)
             runner = env.create_local_runner()
             saved = {k: getattr(mod, k) for k in (patch or {})}
             for key, value in (patch or {}).items():

@@ -16,7 +16,7 @@ The upload always goes through the proxy. If the backend returns a `*.linodeobje
 ## Before the test
 
 - **Script:** once the VM is set up as in [vm/README.md](../../vm/README.md), it runs the latest `master` by itself. Until then, SRE puts `locustfile.py` into the Locust Docker container; ask them again whenever the script changes.
-- **Only our script should run.** Under **User classes** on the start form, tick only `DesignExportUser`. If another script is loaded without `--class-picker` (e.g. the old health-check script), both run together and `/app/live` requests mix into the results.
+- **Only our script should run.** Under **User classes** on the start form, tick only `StlPresignUploadUser`. If another script is loaded without `--class-picker` (e.g. the old health-check script), both run together and `/app/live` requests mix into the results.
 - **Where Locust runs:** a Docker container on a VM in Singapore, the same region as the Linode bucket (confirmed by SRE, 2026-11-20). It calls the public gateway and proxy, the same path as a browser. A small VM can still be the bottleneck: if uploads are slow but the proxy is calm in Grafana, check the VM's CPU and network.
 - **Locust version:** the script was tested with 2.47. Ask SRE which version the VM runs.
 - **Time slot:** agree on one with Kin (and anyone else load testing sandbox), so results don't mix.
@@ -24,7 +24,7 @@ The upload always goes through the proxy. If the backend returns a `*.linodeobje
 
 ## Start a case in the Locust dashboard
 
-- **Host:** already filled in (`https://gateway-sandbox-dynamic.rata.id`).
+- **Host:** `https://gateway-sandbox-dynamic.rata.id` (type it in; the script has no default host). Ignore the host shown in a user class's ⚙ settings.
 - **Number of users / Ramp up:** see the table below.
 - **Custom parameters:**
 

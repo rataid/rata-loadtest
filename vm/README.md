@@ -47,7 +47,7 @@ On the VM, in a new folder (e.g. `~/rata-loadtest-vm`):
    docker compose logs -f
    ```
    Expect `updated successfully` from git-sync, then `[supervisor] starting Locust on <commit>` and
-   `Starting web interface`. The dashboard should list `DesignExportUser` under **User classes**.
+   `Starting web interface`. The dashboard should list `StlPresignUploadUser` under **User classes**.
 
 ## Try it locally first
 

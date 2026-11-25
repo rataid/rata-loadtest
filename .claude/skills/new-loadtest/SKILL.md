@@ -78,7 +78,7 @@ If the context came as an argument, read it and the code as in step 1. Stop and 
 ## 4. Write the test
 
 In the test folder, following `CLAUDE.md` and the reference:
-- `locustfile.py`: host set, token as a secret custom parameter, settings with correctly typed defaults, bounded
+- `locustfile.py`: no host on the user class (the README says what to type in Host), token as a secret custom parameter, settings with correctly typed defaults, bounded
   work per user, timeouts, grouped failure reasons without URLs, `SETUP` failure for a missing token, `on_stop`
   cleanup, rows named by step, test data labelled with the agreed prefix.
 - `README.md`: same sections as the reference README, filled from the context (cases, settings table, rows,

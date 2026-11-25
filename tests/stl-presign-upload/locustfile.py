@@ -138,8 +138,8 @@ def failure_reason(res):
     return f"status {res.status_code}: {short_body(res.text)}"
 
 
-class DesignExportUser(HttpUser):
-    host = "https://gateway-sandbox-dynamic.rata.id"
+class StlPresignUploadUser(HttpUser):
+    # No host here: the target is the Host field on the start form (sandbox: https://gateway-sandbox-dynamic.rata.id).
     # Pauses are handled in the task (wait-seconds, and idle when done).
     wait_time = constant(0)
 
